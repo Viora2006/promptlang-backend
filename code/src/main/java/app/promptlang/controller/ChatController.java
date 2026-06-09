@@ -4,6 +4,7 @@ import app.promptlang.dto.ChatRequest;
 import app.promptlang.dto.GeneratedCodeResponse;
 import app.promptlang.service.ChatService;
 import org.springframework.web.bind.annotation.*;
+import app.promptlang.service.JwtService;
 
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,13 +20,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ChatController {
 
     private final ChatService chatService;
-
-    public ChatController(ChatService chatService) {
+    private final JwtService jwtService;
+    public ChatController(ChatService chatService, JwtService jwtService) {
         this.chatService = chatService;
+        this.jwtService = jwtService;
     }
     // due to -method POST, it would look here
     @PostMapping
     public GeneratedCodeResponse chat(@RequestBody ChatRequest request) {
-        return chatService.generateResponse(request.getMessage(), request.getUsername());
+         String username = jwtService.extractUsername(request.getToken());
+        return chatService.generateResponse(request.getMessage(), username);
     }
 }

@@ -11,10 +11,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.jwtService = jwtService;
     }
 
     public void register(String username, String password) {
@@ -46,6 +48,9 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        return new AuthResponse("Login successful");
+        String token = jwtService.generateToken(
+        user.getUsername());
+
+        return new AuthResponse("Login successful", token);
     }
 }
